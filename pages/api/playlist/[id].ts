@@ -10,5 +10,6 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+    if(!ytpl.validateID(req.query.id as string)) return res.json({items:[]})
     ytpl(req.query.id as string).then(res.json)
 }
