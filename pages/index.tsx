@@ -73,7 +73,7 @@ const Home: NextPage = () => {
         {songList.length < 1 ? (
           <>
             <h2>Enter the playlist</h2>
-            <input type="text" placeholder='playlist url' value={playlistURLInput} onChange={e=>setPlaylistURLInput(e.target.value)}/>
+            <input type="text" placeholder='youtube playlist url' value={playlistURLInput} onChange={e=>setPlaylistURLInput(e.target.value)}/>
             <input type="button" value="save" onClick={()=>setPlaylistURL(playlistURLInput)} />
           </>
         ) : (
