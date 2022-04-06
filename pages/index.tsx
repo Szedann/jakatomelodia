@@ -125,8 +125,8 @@ const Game: NextPage = () => {
               <div className={styles.share_menu}>
                 {playlistID?(
                 <div className={styles.share_playlist}>
-                  click on the url to copy: <br />
-                  <code onClick={e=>copy(e.currentTarget.innerText)}>
+                  click on the link to copy: <br />
+                  <code className={styles.button} onClick={e=>copy(e.currentTarget.innerText)}>
                     {location.origin}?playlistID={playlistID}
                   </code>
                 </div>)
@@ -134,18 +134,18 @@ const Game: NextPage = () => {
                 (<><span onClick={savePlaylist} className={styles.button}>save the playlist</span> for you & your friends to play</>)}
                 <span>or share your results on</span>
                 {playlistID ? (
-                  <>
+                  <div>
                     <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
                       Facebook,
                     </FacebookShareButton>
                     <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
                       Twitter,
                     </TwitterShareButton>
-                    or
+                    or&nbsp;
                     <span className={styles.button} onClick={()=>{const sr = shareResults();copy(sr.text+'\n'+sr.url)}}>
-                      copy the invite to paste anywhere
+                      copy the invite to paste it anywhere
                     </span>
-                  </>
+                  </div>
                 ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
                 <p></p>
               </div>
