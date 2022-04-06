@@ -63,3 +63,16 @@
 .name_input:focus-within .suggestions, .name_input:hover .suggestions, .suggestions:hover{
   display: flex;
 }
+
+.share_playlist{
+  background-color: #000;
+  color: #fff;
+  border-radius: .5em;
+  width: fit-content;
+  padding: 1em;
+}
+
+.button{
+  text-decoration: underline;
+  cursor: pointer;
+}

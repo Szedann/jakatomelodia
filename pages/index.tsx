@@ -1,7 +1,11 @@
+import { addDoc, collection, doc, getDoc} from 'firebase/firestore'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { app, db } from '../firebase'
 import styles from '/styles/Home.module.css'
+import { FacebookShareButton, TwitterShareButton } from 'react-share'
 
 const Game: NextPage = () => {
   const [queue, setQueue] = useState([] as {title:string, id:string}[])
@@ -12,6 +16,9 @@ const Game: NextPage = () => {
   const [guess, setGuess] = useState("")
   const [isPlaying, setIsPlaying] = useState(false)
   const [ended, setEnded] = useState(false)
+  const [playlistID, setPlaylistID] = useState('')
+  const [isFirstSet, setIsFirstSet] = useState(false)
+  const router = useRouter()
 
   const addToSongs = async (url:string)=>{
     const data = await (await fetch(`/api/details?url=${url}`)).json()
@@ -20,6 +27,22 @@ const Game: NextPage = () => {
     }))
     setURLInput('')
   }
+  useEffect(()=>{
+    (async () => {
+      const playlistID = router.query.playlistID
+      if(typeof playlistID != 'string') return
+      const docRef = doc(db, 'playlists', playlistID)
+      const docSnap = await getDoc(docRef)
+      setSongsToSet(docSnap.data()?.songs)
+      setPlaylistID(playlistID)
+      setIsFirstSet(true)
+   })()
+  },[router.isReady]);
+
+  useEffect(()=>{
+    if(isFirstSet) return setIsFirstSet(false)
+    setPlaylistID('')
+  },[songsToSet])
 
   const shuffle = (array:any[]) => {
     let currentIndex = array.length, randomIndex;
@@ -68,6 +91,22 @@ const Game: NextPage = () => {
   const removeFromToSet = (id:string) => {
     setSongsToSet(songsToSet.filter(s=>s.id!=id))
   }
+  const copy = (text:string) =>{
+    navigator.clipboard.writeText(text)
+  }
+  const savePlaylist = async ()=>{
+    const added = await addDoc(collection(db, 'playlists'),{songs:songsToSet})
+    const id = added.id
+    setPlaylistID(id)
+    copy(`${location.origin}?playlistID=${playlistID}`)
+  }
+
+  const shareResults = ()=>{
+    const text = `JTM results: correct guesses: ${correctGuessesAmount}/${guessesAmount} ${ guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") }, total time: ${totalTime/1000}s`
+    const data = {text:text,url:`${location.origin}?playlistID=${playlistID}`}
+    return data
+
+  }
   
   return (
     <div className={styles.container}>
@@ -82,20 +121,48 @@ const Game: NextPage = () => {
         {ended?(
           <>
             <h1>Game Ended!</h1>
+            
+              {playlistID?(
+              <div className={styles.share_playlist}>
+                click on the url to copy: <br />
+                <code onClick={e=>copy(e.currentTarget.innerText)}>
+                  {location.origin}?playlistID={playlistID}
+                </code>
+              </div>)
+              :
+              (<span onClick={savePlaylist} className={styles.button}>save the playlist</span>)}
+              <span>or share your results on</span>
+              {playlistID ? (
+                <>
+                  <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
+                    Facebook
+                  </FacebookShareButton>
+                  or
+                  <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
+                    Twitter
+                  </TwitterShareButton>
+                </>
+              ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
+              <p></p>
+            
             <div>
               correct guesses: {correctGuessesAmount}/{guessesAmount} { guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") },
-                total time: {totalTime/1000}s
+              total time: {totalTime/1000}s
             </div>
           </>
         ):queue.length < 1 ? (
           <>
             <h2>Add songs</h2>
-            <input type="text" placeholder='url' value={URLInput} onChange={e=>setURLInput(e.target.value)}/>
+            <input type="text" placeholder='youtube video url/playlist url/video title' value={URLInput} onChange={e=>setURLInput(e.target.value)}/>
             <input type="button" value="Add" onClick={()=>addToSongs(URLInput)} />
             <input type="button" value="Start" onClick={()=>setQueue(shuffle(songsToSet))} />
+            <h3>Added songs:</h3>
             <ul>
-              {songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} style={{color: 'red', cursor: 'pointer'}}>remove</span></li>)}
-            </ul>
+              {songsToSet.length ? 
+              songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} style={{color: 'red', cursor: 'pointer'}}>remove</span></li>)
+              : <li><em style={{opacity:0.5}}>none</em></li>
+              }
+              </ul>
           </>
         ) : (
           <>
