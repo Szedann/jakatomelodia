@@ -28,7 +28,7 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
-  text-align: left;
+  text-align: center;
 }
 
 .suggestions{
@@ -45,6 +45,7 @@
   overflow: auto;
   z-index: 100;
   padding: 0;
+  text-align: left;
 }
 .suggestions li{
   list-style: none;
