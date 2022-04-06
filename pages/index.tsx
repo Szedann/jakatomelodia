@@ -102,7 +102,7 @@ const Game: NextPage = () => {
   }
 
   const shareResults = ()=>{
-    const text = `Name the tune game - correct guesses: ${correctGuessesAmount}/${guessesAmount} ${ guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") }, total time: ${totalTime/1000}s.\nTry to beat me...`
+    const text = `Name the tune game.\ncorrect guesses: ${correctGuessesAmount}/${guessesAmount} ${ guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") }, total time: ${totalTime/1000}s.\nTry to beat me...`
     const data = {text:text,url:`${location.origin}?playlistID=${playlistID}`}
     return data
 
@@ -112,7 +112,7 @@ const Game: NextPage = () => {
     <div className={styles.container}>
       <Head>
         <title>Name the tune</title>
-        <meta name="description" content="Name the tune game" />
+        <meta name="description" content="Music based game made by Szedann" />
         <link rel="icon" href="/favicon.ico" />
         
       </Head>
