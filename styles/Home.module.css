@@ -50,7 +50,14 @@
 .suggestions li{
   list-style: none;
   border-bottom: 1px solid #0005;
+  user-select: none;
+  cursor: pointer;
 }
+
+.suggestions li:last-of-type{
+  border-bottom: 0;
+}
+
 .suggestions li:hover{
   background-color: #0003;
 }
@@ -75,4 +82,11 @@
 .button{
   text-decoration: underline;
   cursor: pointer;
+}
+
+.share_menu{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

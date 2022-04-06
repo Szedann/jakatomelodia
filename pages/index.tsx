@@ -102,7 +102,7 @@ const Game: NextPage = () => {
   }
 
   const shareResults = ()=>{
-    const text = `JTM results: correct guesses: ${correctGuessesAmount}/${guessesAmount} ${ guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") }, total time: ${totalTime/1000}s`
+    const text = `Name the tune game - correct guesses: ${correctGuessesAmount}/${guessesAmount} ${ guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") }, total time: ${totalTime/1000}s.\nTry to beat me...`
     const data = {text:text,url:`${location.origin}?playlistID=${playlistID}`}
     return data
 
@@ -111,8 +111,8 @@ const Game: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Name that tune</title>
-        <meta name="description" content="Name that tune type game" />
+        <title>Name the tune</title>
+        <meta name="description" content="Name the tune game" />
         <link rel="icon" href="/favicon.ico" />
         
       </Head>
@@ -122,28 +122,33 @@ const Game: NextPage = () => {
           <>
             <h1>Game Ended!</h1>
             
-              {playlistID?(
-              <div className={styles.share_playlist}>
-                click on the url to copy: <br />
-                <code onClick={e=>copy(e.currentTarget.innerText)}>
-                  {location.origin}?playlistID={playlistID}
-                </code>
-              </div>)
-              :
-              (<span onClick={savePlaylist} className={styles.button}>save the playlist</span>)}
-              <span>or share your results on</span>
-              {playlistID ? (
-                <>
-                  <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
-                    Facebook
-                  </FacebookShareButton>
-                  or
-                  <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
-                    Twitter
-                  </TwitterShareButton>
-                </>
-              ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
-              <p></p>
+              <div className={styles.share_menu}>
+                {playlistID?(
+                <div className={styles.share_playlist}>
+                  click on the url to copy: <br />
+                  <code onClick={e=>copy(e.currentTarget.innerText)}>
+                    {location.origin}?playlistID={playlistID}
+                  </code>
+                </div>)
+                :
+                (<><span onClick={savePlaylist} className={styles.button}>save the playlist</span> for you & your friends to play</>)}
+                <span>or share your results on</span>
+                {playlistID ? (
+                  <>
+                    <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
+                      Facebook,
+                    </FacebookShareButton>
+                    <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
+                      Twitter,
+                    </TwitterShareButton>
+                    or
+                    <span className={styles.button} onClick={()=>{const sr = shareResults();copy(sr.text+'\n'+sr.url)}}>
+                      copy the invite to paste anywhere
+                    </span>
+                  </>
+                ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
+                <p></p>
+              </div>
             
             <div>
               correct guesses: {correctGuessesAmount}/{guessesAmount} { guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") },
