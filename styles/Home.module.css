@@ -30,3 +30,31 @@
   overflow: auto;
   text-align: left;
 }
+
+.suggestions{
+  max-height: 200px;
+  overflow: auto;
+  background-color: #fff;
+  border: 1px solid black;
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  overflow: auto;
+  z-index: 100;
+  padding: 0;
+}
+.suggestions li{
+  list-style: none;
+}
+.suggestions li:hover{
+  background-color: #0003;
+}
+.name_input{
+  position: relative;
+}
+.name_input:focus-within .suggestions, .name_input:hover .suggestions, .suggestions:hover{
+  display: flex;
+}

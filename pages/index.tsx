@@ -1,37 +1,43 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import styles from '../styles/Home.module.css'
+import styles from '/styles/Home.module.css'
 
-const Home: NextPage = () => {
-  const [songList, setSongList] = useState([] as {title:string, id:string}[])
+const Game: NextPage = () => {
+  const [queue, setQueue] = useState([] as {title:string, id:string}[])
   const [currentSong, setCurrentSong] = useState(null as {title:string, id:string}|null)
-  const [playlistURLInput, setPlaylistURLInput] = useState('')
-  const [playlistURL, setPlaylistURL] = useState('')
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [URLInput, setURLInput] = useState('')
+  const [songsToSet, setSongsToSet] = useState([] as {title:string, id:string}[])
+  const [currentIndex, setCurrentIndex] = useState(-2)
   const [guess, setGuess] = useState("")
   const [isPlaying, setIsPlaying] = useState(false)
-  useEffect(() => {
-    if(!playlistURL) return
-    fetch(`/api/playlist/${playlistURL.split('=').slice(-1)[0]}`).then(res => res.json()).then(res => {
-      const songs = (res.items.map((item:any)=>({title: item.title, id: item.id})) as {title:string, id:string}[]).filter((item, index, self) => {
-        return self.findIndex(i => i.id === item.id) === index
-      })
-      let currentIndex = songs.length,  randomIndex;
-      while (currentIndex != 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [songs[currentIndex], songs[randomIndex]] = [
-          songs[randomIndex], songs[currentIndex]];
-      }
-      setSongList(songs)
-    })
-  }, [playlistURL])
+  const [ended, setEnded] = useState(false)
+
+  const addToSongs = async (url:string)=>{
+    const data = await (await fetch(`/api/details?url=${url}`)).json()
+    setSongsToSet([...songsToSet, ...data].filter((item, index, self) => {
+      return self.findIndex(i => i.id === item.id) === index
+    }))
+    setURLInput('')
+  }
+
+  const shuffle = (array:any[]) => {
+    let currentIndex = array.length, randomIndex;
+    while (0 !== currentIndex) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+      [array[currentIndex], array[randomIndex]] =
+      [array[randomIndex], array[currentIndex]]
+    }
+
+    return array;
+  }
+
   const [lastGuesses, setLastGuesses] = useState([] as {title:string,id:string,correct:boolean, time:number}[])
   const [currentSongStartTimestamp,setCurrentSongStartTimestamp] = useState(0)
 
-  useEffect(() => {
-    setCurrentSong(songList[currentIndex])
+  useEffect(()=>{
+    setCurrentSong(queue[currentIndex])
     setGuess("")
     setCurrentSongStartTimestamp(new Date().valueOf())
   }, [currentIndex])
@@ -39,19 +45,18 @@ const Home: NextPage = () => {
   const nextSong = () => {
     if(!isPlaying) return
     setIsPlaying(false)
-    if(songList.length < 2) return
-    if(currentIndex >= songList.length) {
-      setCurrentIndex(0)
-    } else {
-      setCurrentIndex(currentIndex + 1)
-    }
+    if(queue.length < 2) return
+    if(currentIndex+1 >= queue.length) setEnded(true)
+    else setCurrentIndex(currentIndex + 1)
     if(!currentSong) return
-    setLastGuesses([...lastGuesses, {time: (new Date().valueOf()) - currentSongStartTimestamp, title: currentSong?.title, id: currentSong?.id, correct: currentSong == songList.find(s=>s.title.toLowerCase().includes(guess.toLowerCase()))}])
+    setLastGuesses([...lastGuesses, {time: (new Date().valueOf()) - currentSongStartTimestamp, title: currentSong?.title, id: currentSong?.id+`${Math.floor(Math.random()*100)}`, correct: currentSong == queue.slice().sort(lSort).find(search)}])
   }
   useEffect(() => {
     setCurrentIndex(currentIndex+1)
-    console.log('...')
-  }, [songList])
+  }, [queue])
+
+  const search = (s:{title:string})=>s.title.toLowerCase().includes(guess.toLowerCase());
+  const lSort = (a:{title:string},b:{title:string})=>guess.length ? Math.min(1,Math.max(-1,Math.abs(a.title.length-guess.length)-Math.abs(b.title.length-guess.length))) : a.title.localeCompare(b.title)
 
   const guessesAmount = lastGuesses.length
   const correctGuessesAmount = lastGuesses.filter(g=>g.correct).length
@@ -69,22 +74,35 @@ const Home: NextPage = () => {
         
       </Head>
 
-      <main className={styles.main}>
-        {songList.length < 1 ? (
+      <main className={styles.main} onKeyUp={e=>{if(e.key=="Enter") nextSong()}}>
+        {ended?(
           <>
-            <h2>Enter the playlist</h2>
-            <input type="text" placeholder='youtube playlist url' value={playlistURLInput} onChange={e=>setPlaylistURLInput(e.target.value)}/>
-            <input type="button" value="save" onClick={()=>setPlaylistURL(playlistURLInput)} />
+            <h1>Game Ended!</h1>
+            <div>
+              correct guesses: {correctGuessesAmount}/{guessesAmount} { guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") },
+                total time: {totalTime/1000}s
+            </div>
+          </>
+        ):queue.length < 1 ? (
+          <>
+            <h2>Add songs</h2>
+            <input type="text" placeholder='url' value={URLInput} onChange={e=>setURLInput(e.target.value)}/>
+            <input type="button" value="Add" onClick={()=>addToSongs(URLInput)} />
+            <input type="button" value="Start" onClick={()=>setQueue(shuffle(songsToSet))} />
+            <ul>
+              {songsToSet.map(song=><li key={song.id}>{song.title}</li>)}
+            </ul>
           </>
         ) : (
           <>
-            {currentSong && <audio src={`/api/vid/${currentSong.id}`} onEnded={nextSong} onError={()=>currentIndex >= songList.length?setCurrentIndex(0):setCurrentIndex(currentIndex+1)} onCanPlay={e=>{e.currentTarget.play();setCurrentSongStartTimestamp(new Date().valueOf()); setIsPlaying(true)}}></audio>}
+            {currentSong && <audio src={`/api/vid/${currentSong.id}`} onEnded={nextSong} onError={()=>currentIndex>=queue.length?setCurrentIndex(0):setCurrentIndex(currentIndex+1)} onCanPlay={e=>{e.currentTarget.play();setCurrentSongStartTimestamp(new Date().valueOf()); setIsPlaying(true)}}></audio>}
             <h2>What is this song called?</h2>
-            <input type="text" list='songs' value={guess} onKeyUp={e=>{if(e.key=="Enter")nextSong()}} onChange={e=>setGuess(e.currentTarget.value)} />
-            <datalist id="songs">
-              {songList.map(song => <option value={song.title} key={song.id}/>)}
-            </datalist>
-            <input onClick={nextSong} type="button" value="next"/>
+            <div className={styles.name_input}>
+              <input type="text" list='songs' value={guess} onChange={e=>setGuess(e.currentTarget.value)} />
+              <ul className={styles.suggestions}>{queue.filter(search).sort(lSort).map(song => <li onClick={e=>{setGuess(e.currentTarget.innerText)}} key={song.id}>{song.title}</li>)}</ul>
+            </div>
+            
+            <input onClick={()=>nextSong()} type="button" value={isPlaying?'Check':'Loading...'} disabled={!isPlaying}/>
             correct guesses: {correctGuessesAmount}/{guessesAmount} { guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") }, 
             total time: {totalTime/1000}s
           </>
@@ -97,4 +115,4 @@ const Home: NextPage = () => {
   )
 }
 
-export default Home
+export default Game
