@@ -39,7 +39,7 @@
   display: none;
   flex-direction: column;
   position: absolute;
-  top: 0;
+  top: 40%;
   left: 0;
   width: 100%;
   overflow: auto;
@@ -49,12 +49,16 @@
 }
 .suggestions li{
   list-style: none;
+  border-bottom: 1px solid #0005;
 }
 .suggestions li:hover{
   background-color: #0003;
 }
 .name_input{
   position: relative;
+}
+.name_input > *{
+  padding: .3em .5em;
 }
 .name_input:focus-within .suggestions, .name_input:hover .suggestions, .suggestions:hover{
   display: flex;

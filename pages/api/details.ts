@@ -29,6 +29,14 @@ export default async function handler(
         const videos = (await ytpl(url, {limit:Infinity})).items
         return res.json(videos.map(vid=>{return {title:vid.title,id:vid.id}}))
     }
+
+    const searchResults = await ytSearch(url,opts)
+
+    const title = searchResults.results[0].title
+    const id = searchResults.results[0].id
+
+    return res.json([{title,id}])
+
     const data = await (await fetch('https://accounts.spotify.com/api/token', {
         body:'grant_type=client_credentials',
         headers:{

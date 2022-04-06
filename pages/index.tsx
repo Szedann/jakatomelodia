@@ -64,6 +64,10 @@ const Game: NextPage = () => {
   for(const song of lastGuesses){
     totalTime+=song.time
   }
+
+  const removeFromToSet = (id:string) => {
+    setSongsToSet(songsToSet.filter(s=>s.id!=id))
+  }
   
   return (
     <div className={styles.container}>
@@ -90,13 +94,13 @@ const Game: NextPage = () => {
             <input type="button" value="Add" onClick={()=>addToSongs(URLInput)} />
             <input type="button" value="Start" onClick={()=>setQueue(shuffle(songsToSet))} />
             <ul>
-              {songsToSet.map(song=><li key={song.id}>{song.title}</li>)}
+              {songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} style={{color: 'red', cursor: 'pointer'}}>remove</span></li>)}
             </ul>
           </>
         ) : (
           <>
             {currentSong && <audio src={`/api/vid/${currentSong.id}`} onEnded={nextSong} onError={()=>currentIndex>=queue.length?setCurrentIndex(0):setCurrentIndex(currentIndex+1)} onCanPlay={e=>{e.currentTarget.play();setCurrentSongStartTimestamp(new Date().valueOf()); setIsPlaying(true)}}></audio>}
-            <h2>What is this song called?</h2>
+            <h2>Song {currentIndex+1}/{queue.length}</h2>
             <div className={styles.name_input}>
               <input type="text" list='songs' value={guess} onChange={e=>setGuess(e.currentTarget.value)} />
               <ul className={styles.suggestions}>{queue.filter(search).sort(lSort).map(song => <li onClick={e=>{setGuess(e.currentTarget.innerText)}} key={song.id}>{song.title}</li>)}</ul>
@@ -108,7 +112,7 @@ const Game: NextPage = () => {
           </>
         )}
         <div className={styles.last_songs}>
-          {lastGuesses.slice(0).reverse().map(guess => <div key={guess.id}>{guess.correct ? '+' : '-'} {guess.title}({guess.time/1000}s)</div>)}
+          {lastGuesses.slice(0).reverse().map(guess => <div className={guess.correct?styles.correct_guess:styles.incorrect_guess} key={guess.id}>{guess.correct ? '+' : '-'} {guess.title}({guess.time/1000}s)</div>)}
         </div>
       </main>
     </div>
