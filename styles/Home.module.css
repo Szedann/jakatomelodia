@@ -93,3 +93,81 @@
   justify-content: center;
   align-items: center;
 }
+
+.header{
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+  width: 100vw;
+  position: fixed;
+  padding: .5em 1em;
+}
+
+.header_user > div > *:after{
+  content: '|';
+  margin: 0 2px;
+}
+
+.header_user > div > *:last-of-type:after{
+  content: '';
+}
+
+.header_user{
+  display: flex;
+}
+
+.user_display_name{
+  margin: 0 2px;
+}
+
+.playlist_field{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+  width: 100%;
+}
+
+
+.playlist_field .general{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.playlist_field .extended{
+  width: 90%;
+}
+
+.playlist_field .extended li{
+  width: 100%;
+  padding: .05em .5em;
+  box-sizing: border-box;
+}
+
+.playlist_field .extended li:nth-child(2n){
+  background-color: #0003;
+}
+
+.playlist_field input{
+  width: 100%;
+  max-width: 25vw;
+  border: 0;
+  font-size: 1.2em;
+  border-bottom: 2px solid black;
+
+}
+
+.playlist_field *{
+  width: fit-content;
+  margin-right: .1em;
+}
+
+.playlist_list{
+  height: 20em;
+  display: flex;
+  flex-direction: column;
+}

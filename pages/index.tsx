@@ -1,14 +1,23 @@
 import { addDoc, collection, doc, getDoc} from 'firebase/firestore'
+import { app, db, auth } from '../firebase'
+import {
+  GoogleAuthProvider,
+  getAuth,
+  signInWithPopup,
+  signOut,
+} from  'firebase/auth'
+import {useAuthState} from 'react-firebase-hooks/auth'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { app, db } from '../firebase'
 import styles from '/styles/Home.module.css'
 import { FacebookShareButton, TwitterShareButton } from 'react-share'
+import Link from 'next/link'
 
 const Game: NextPage = () => {
   const [queue, setQueue] = useState([] as {title:string, id:string}[])
+  const [title, setTitle] = useState("Name the tune")
   const [currentSong, setCurrentSong] = useState(null as {title:string, id:string}|null)
   const [URLInput, setURLInput] = useState('')
   const [songsToSet, setSongsToSet] = useState([] as {title:string, id:string}[])
@@ -19,6 +28,7 @@ const Game: NextPage = () => {
   const [playlistID, setPlaylistID] = useState('')
   const [isFirstSet, setIsFirstSet] = useState(false)
   const router = useRouter()
+  const [user] =  useAuthState(auth)
 
   const addToSongs = async (url:string)=>{
     const data = await (await fetch(`/api/details?url=${url}`)).json()
@@ -32,8 +42,10 @@ const Game: NextPage = () => {
       const playlistID = router.query.playlistID
       if(typeof playlistID != 'string') return
       const docRef = doc(db, 'playlists', playlistID)
-      const docSnap = await getDoc(docRef)
-      setSongsToSet(docSnap.data()?.songs)
+      const docSnap = await (await getDoc(docRef)).data()
+      if(!docSnap) return
+      setSongsToSet(docSnap.songs)
+      if(docSnap.name) setTitle(docSnap.name + " - " + title)
       setPlaylistID(playlistID)
       setIsFirstSet(true)
    })()
@@ -95,7 +107,7 @@ const Game: NextPage = () => {
     navigator.clipboard.writeText(text)
   }
   const savePlaylist = async ()=>{
-    const added = await addDoc(collection(db, 'playlists'),{songs:songsToSet})
+    const added = await addDoc(collection(db, 'playlists'),{songs:songsToSet, user: user?.uid})
     const id = added.id
     setPlaylistID(id)
     copy(`${location.origin}?playlistID=${playlistID}`)
@@ -107,48 +119,75 @@ const Game: NextPage = () => {
     return data
 
   }
+
+  const signInWithGoogle = ()=>{
+    const provider = new GoogleAuthProvider()
+    signInWithPopup(auth, provider)
+  }
   
   return (
     <div className={styles.container}>
       <Head>
-        <title>Name the tune</title>
+        <title>{title}</title>
         <meta name="description" content="Music based game made by Szedann" />
         <link rel="icon" href="/favicon.ico" />
         
       </Head>
 
+      <header className={styles.header}>
+        {user?(
+          <span className={styles.header_user}>
+            <span className={styles.user_display_name}>{user.displayName} </span>
+            <div>
+              <Link href='playlists'><span className={styles.button}>my playlists</span></Link>
+              <span className={styles.button} onClick={()=>signOut(auth)}>log out</span>
+            </div>
+          </span>
+        ):(
+          <span>not signed in <span className={styles.button} onClick={signInWithGoogle}>Sign in with Google</span></span>
+        )}
+      </header>
+
       <main className={styles.main} onKeyUp={e=>{if(e.key=="Enter") nextSong()}}>
         {ended?(
           <>
             <h1>Game Ended!</h1>
-            
-              <div className={styles.share_menu}>
-                {playlistID?(
-                <div className={styles.share_playlist}>
-                  click on the link to copy: <br />
-                  <code className={styles.button} onClick={e=>copy(e.currentTarget.innerText)}>
-                    {location.origin}?playlistID={playlistID}
-                  </code>
-                </div>)
-                :
-                (<><span onClick={savePlaylist} className={styles.button}>save the playlist</span> for you & your friends to play</>)}
-                <span>or share your results on</span>
-                {playlistID ? (
-                  <div>
-                    <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
-                      Facebook,
-                    </FacebookShareButton>
-                    <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
-                      Twitter,
-                    </TwitterShareButton>
-                    or&nbsp;
-                    <span className={styles.button} onClick={()=>{const sr = shareResults();copy(sr.text+'\n'+sr.url)}}>
-                      copy the invite to paste it anywhere
-                    </span>
-                  </div>
-                ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
-                <p></p>
-              </div>
+              {user ? (
+                
+                <div className={styles.share_menu}>
+                  {playlistID?(
+                  <div className={styles.share_playlist}>
+                    click on the link to copy: <br />
+                    <code className={styles.button} onClick={e=>copy(e.currentTarget.innerText)}>
+                      {location.origin}?playlistID={playlistID}
+                    </code>
+                  </div>)
+                  :
+                  (<><span onClick={savePlaylist} className={styles.button}>save the playlist</span> for you & your friends to play</>)}
+                  <span>or share your results on</span>
+                  {playlistID ? (
+                    <div>
+                      <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
+                        Facebook,
+                      </FacebookShareButton>
+                      <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
+                        Twitter,
+                      </TwitterShareButton>
+                      or&nbsp;
+                      <span className={styles.button} onClick={()=>{const sr = shareResults();copy(sr.text+'\n'+sr.url)}}>
+                        copy the invite to paste it anywhere
+                      </span>
+                    </div>
+                  ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
+                  <p></p>
+                </div>
+                
+              ):(
+                <div className="singIn">
+                  <span className={styles.button} onClick={signInWithGoogle}>Sign in with Google</span> to save the playlist or share
+                </div>
+              )}
+              
             
             <div>
               correct guesses: {correctGuessesAmount}/{guessesAmount} { guessesAmount && (Math.round(100*correctGuessesAmount/guessesAmount)+"%") },
@@ -161,6 +200,14 @@ const Game: NextPage = () => {
             <input type="text" placeholder='youtube video url/playlist url/video title' value={URLInput} onChange={e=>setURLInput(e.target.value)}/>
             <input type="button" value="Add" onClick={()=>addToSongs(URLInput)} />
             <input type="button" value="Start" onClick={()=>setQueue(shuffle(songsToSet))} />
+            {
+            songsToSet.length>0 &&
+            (playlistID ? (
+               <input type="button" onClick={e=>copy(e.currentTarget.innerText)} value={`copy playlist link: ${location.origin}?playlistID=${playlistID}`} />
+            ) : (
+              user &&
+              <input type="button" value="Save playlist" onClick={()=>savePlaylist()} />
+            ))}
             <h3>Added songs:</h3>
             <ul>
               {songsToSet.length ? 

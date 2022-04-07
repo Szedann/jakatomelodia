@@ -6,7 +6,7 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const stream = ytdl(req.query.id as string, {filter: 'audioonly', quality: 'lowest'})
+  const stream = ytdl(req.query.id as string, {filter: 'audioonly'})
   stream.on('error', err=>{
     return res.status(300).send(err.message)
   })

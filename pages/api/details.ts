@@ -18,6 +18,7 @@ export default async function handler(
   res: NextApiResponse<{title:string,id:string}[]>
 ) {
     const url = req.query.url as string
+    if(!url) return res.json([])
     if(ytdl.validateURL(url)){
         const details = (await ytdl.getBasicInfo(url)).videoDetails
         return res.json([{
@@ -36,36 +37,4 @@ export default async function handler(
     const id = searchResults.results[0].id
 
     return res.json([{title,id}])
-
-    const data = await (await fetch('https://accounts.spotify.com/api/token', {
-        body:'grant_type=client_credentials',
-        headers:{
-            'content-type':'application/x-www-form-urlencoded ',
-            'authorization':`Basic ${base64.encode(process.env.SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET)}`
-        },
-        credentials: 'include',
-        method:'POST'
-    })).json()
-    spotifyApi.setAccessToken(data.access_token)
-    const spotifyPlaylist = await spotifyApi.getPlaylist(url.split('/').slice(-1)[0].split('?')[0])
-    console.log(spotifyPlaylist)
-    if(spotifyPlaylist.statusCode==200){
-        const tracks = spotifyPlaylist.body.tracks.items.map(item=>item.track)
-        const ret = []
-        for(const track of tracks){
-            console.log(`${track.artists[0].name} - ${track.name}`)
-            try {
-                const results = await ytSearch(`${track.artists[0].name} - ${track.name}`,opts)
-                if(!results) continue
-                const vid = results.results[0]
-                ret.push({id:vid.id,title:vid.title})
-                console.log(ret)
-            } catch (error) {
-                console.log("err")
-            }
-        }
-        console.log(ret)
-        return res.json(ret)
-    }
-  
 }
