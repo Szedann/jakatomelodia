@@ -7,6 +7,8 @@ export default function handler(
   res: NextApiResponse
 ) {
   const stream = ytdl(req.query.id as string, {filter: 'audioonly'})
+  const refHostName = req.headers.referer?.split('/')[2]
+  if(refHostName !==  req.headers.host) return res.status(401).send('error: Unauthorized')
   stream.on('error', err=>{
     return res.status(300).send(err.message)
   })

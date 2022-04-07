@@ -138,8 +138,16 @@
   justify-content: space-between;
 }
 
+
+.playlist_field .general > *{
+  margin-right: .1em;
+}
+
 .playlist_field .extended{
-  width: 90%;
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
 }
 
 .playlist_field .extended li{
@@ -161,10 +169,6 @@
 
 }
 
-.playlist_field *{
-  width: fit-content;
-  margin-right: .1em;
-}
 
 .playlist_list{
   height: 20em;
