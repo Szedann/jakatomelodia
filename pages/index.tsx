@@ -209,7 +209,7 @@ const Game: NextPage = () => {
               <input type="button" value="Save playlist" onClick={()=>savePlaylist()} />
             ))}
             <h3>Added songs:</h3>
-            <ul>
+            <ul className={styles.to_set}>
               {songsToSet.length ? 
               songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} style={{color: 'red', cursor: 'pointer'}}>remove</span></li>)
               : <li><em style={{opacity:0.5}}>none</em></li>

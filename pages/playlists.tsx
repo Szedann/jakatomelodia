@@ -32,9 +32,9 @@ const Playlist = ({playlist, changePlaylistName, deletePlaylist}:{playlist:playl
         <li key={playlist.id} className={styles.playlist_field} >
             <div className={styles.general}>
                 <input type="text" value={playlist.name||''} placeholder="unnamed" onChange={e=>changePlaylistName(playlist.id, e.currentTarget.value)} />
-                <span>{playlist.songs.length} songs</span>
+                <span className={styles.song_amount}>{playlist.songs.length} songs</span>
                 <Link href={`${location.origin}?playlistID=${playlist.id}`}><span className={styles.button}>play</span></Link>
-                <span className={styles.button} style={{color:'red'}} onClick={()=>deletePlaylist(playlist.id)}>delete</span>
+                <span className={styles.button+" "+styles.danger} onClick={()=>deletePlaylist(playlist.id)}>delete</span>
                 <div onClick={()=>setExtended(!extended)} style={{cursor:"pointer", width:'fit-content'}}>{extended?"▲":"▼"}</div>
             </div>
 
