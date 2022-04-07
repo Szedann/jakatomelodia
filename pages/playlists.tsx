@@ -113,7 +113,7 @@ const Game: NextPage = () => {
                 {user?(
                     playlists.length
                     ? playlists.map(playlist=><Playlist changePlaylistName={changePlaylistName} deletePlaylist={deletePlaylist} playlist={playlist} key={playlist.id}/>)
-                    : <li><em style={{opacity:0.5}}>you don't have any saved playlists</em></li>
+                    : <li><em style={{opacity:0.5}}>you don&apos;t have any saved playlists</em></li>
                 ):(
                     <li><em style={{opacity:0.5}}>you are not signed in</em></li>
                 )}
