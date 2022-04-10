@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import styles from '/styles/Home.module.css'
 import { FacebookShareButton, TwitterShareButton } from 'react-share'
 import Link from 'next/link'
+import Navbar from '../components/Navbar'
 
 const Game: NextPage = () => {
   const [queue, setQueue] = useState([] as {title:string, id:string}[])
@@ -107,7 +108,7 @@ const Game: NextPage = () => {
     navigator.clipboard.writeText(text)
   }
   const savePlaylist = async ()=>{
-    const added = await addDoc(collection(db, 'playlists'),{songs:songsToSet, user: user?.uid})
+    const added = await addDoc(collection(db, 'playlists'),{songs:songsToSet, user: user?.uid, public:false})
     const id = added.id
     setPlaylistID(id)
     copy(`${location.origin}?playlistID=${playlistID}`)
@@ -134,19 +135,7 @@ const Game: NextPage = () => {
         
       </Head>
 
-      <header className={styles.header}>
-        {user?(
-          <span className={styles.header_user}>
-            <span className={styles.user_display_name}>{user.displayName} </span>
-            <div>
-              <Link href='playlists'><span className={styles.button}>my playlists</span></Link>
-              <span className={styles.button} onClick={()=>signOut(auth)}>log out</span>
-            </div>
-          </span>
-        ):(
-          <span>not signed in <span className={styles.button} onClick={signInWithGoogle}>Sign in with Google</span></span>
-        )}
-      </header>
+      <Navbar user={user}/>
 
       <main className={styles.main} onKeyUp={e=>{if(e.key=="Enter") nextSong()}}>
         {ended?(
@@ -209,12 +198,12 @@ const Game: NextPage = () => {
               <input type="button" value="Save playlist" onClick={()=>savePlaylist()} />
             ))}
             <h3>Added songs:</h3>
-            <ul className={styles.to_set}>
+            <ol className={styles.to_set}>
               {songsToSet.length ? 
-              songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} style={{color: 'red', cursor: 'pointer'}}>remove</span></li>)
-              : <li><em style={{opacity:0.5}}>none</em></li>
+              songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} className={styles.button+" "+styles.danger}>remove</span></li>)
+              : <em>none</em>
               }
-              </ul>
+              </ol>
           </>
         ) : (
           <>
