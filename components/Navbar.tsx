@@ -13,8 +13,8 @@ const Navbar = ({user}:{user:User|null|undefined})=>{
         {user?(
           <>
               <span className={styles.user_display_name}>{user.displayName} </span>
-              <Link href='/user-playlists'><span className={styles.button}>my playlists</span></Link>
               <span className={styles.button} onClick={()=>signOut(auth)}>log out</span>
+              <Link href='/user-playlists'><span className={styles.button}>my playlists</span></Link>
             </>
         ):(
           <span>not signed in <span className={styles.button} onClick={signInWithGoogle}>Sign in with Google</span></span>
