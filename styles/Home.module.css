@@ -248,8 +248,12 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 5px;
+  margin: 2px 0;
 }
 
 .audio_data > input{
   width: 20%;
+  margin: 0;
+  outline: 0;
 }

@@ -31,7 +31,7 @@ const Game: NextPage = () => {
   const [ended, setEnded] = useState(false)
   const [playlistID, setPlaylistID] = useState('')
   const [isFirstSet, setIsFirstSet] = useState(false)
-  const [volume, setVolume] = useState(.2)
+  const [volume, setVolume] = useState(.1)
   const router = useRouter()
   const [user] =  useAuthState(auth)
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -225,7 +225,7 @@ const Game: NextPage = () => {
           </>
         ) : (
           <>
-            {currentSong && <audio src={`/api/vid/${currentSong.id}`} ref={audioRef} onEnded={nextSong} onError={()=>currentIndex>=queue.length?setCurrentIndex(0):setCurrentIndex(currentIndex+1)} onCanPlay={e=>{e.currentTarget.play();setCurrentSongStartTimestamp(new Date().valueOf()); setIsPlaying(true)}}></audio>}
+            {currentSong && <audio src={`/api/vid/${currentSong.id}`} ref={audioRef} onEnded={nextSong} onError={()=>currentIndex>=queue.length?setCurrentIndex(0):setCurrentIndex(currentIndex+1)} onCanPlay={e=>{e.currentTarget.play();setCurrentSongStartTimestamp(new Date().valueOf()); setIsPlaying(true); if(audioRef.current) audioRef.current.volume = volume;}}></audio>}
             <h2>Song {currentIndex+1}/{queue.length}</h2>
             <div className={styles.name_input}>
               <input autoComplete='off' placeholder='song name' type="text" list='songs' value={guess} onChange={e=>setGuess(e.currentTarget.value)} />
