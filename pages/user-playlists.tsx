@@ -37,7 +37,7 @@ const Playlist = ({playlist, changePlaylistName, deletePlaylist, setPublic}:{pla
                 <input type="text" value={playlist.name||''} placeholder="unnamed" onChange={e=>changePlaylistName(playlist.id, e.currentTarget.value)} />
                 <span className={styles.song_amount}>{playlist.songs.length} songs</span>
                 <label className={styles.is_public}>
-                    <span>{isPublic?'public':'private'}</span>
+                    <span>public</span>
                     <input type="checkbox" checked={isPublic}
                      onChange={e=>{setPublic(playlist.id, e.currentTarget.checked); setIsPublic(e.currentTarget.checked)}}
                       />
