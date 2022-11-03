@@ -10,11 +10,14 @@ import {useAuthState} from 'react-firebase-hooks/auth'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from '/styles/Home.module.css'
 import { FacebookShareButton, TwitterShareButton } from 'react-share'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
+import {IoTrashBinSharp} from 'react-icons/io5'
+
+
 
 const Game: NextPage = () => {
   const [queue, setQueue] = useState([] as {title:string, id:string}[])
@@ -28,8 +31,14 @@ const Game: NextPage = () => {
   const [ended, setEnded] = useState(false)
   const [playlistID, setPlaylistID] = useState('')
   const [isFirstSet, setIsFirstSet] = useState(false)
+  const [volume, setVolume] = useState(.2)
   const router = useRouter()
   const [user] =  useAuthState(auth)
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  useEffect(()=>{
+    if(audioRef.current) audioRef.current.volume = volume
+  },[volume, audioRef])
 
   const addToSongs = async (url:string)=>{
     const data = await (await fetch(`/api/details?url=${url}`)).json()
@@ -71,12 +80,21 @@ const Game: NextPage = () => {
 
   const [lastGuesses, setLastGuesses] = useState([] as {title:string,id:string,correct:boolean, time:number}[])
   const [currentSongStartTimestamp,setCurrentSongStartTimestamp] = useState(0)
+  const [currentSongTime, setCurrentSongTime] = useState(0)
 
   useEffect(()=>{
     setCurrentSong(queue[currentIndex])
     setGuess("")
     setCurrentSongStartTimestamp(new Date().valueOf())
   }, [currentIndex])
+
+  useEffect(()=>{
+    setInterval(()=>{
+      if(audioRef.current) {
+        setCurrentSongTime(audioRef.current?.currentTime||0)
+      }
+    },250)
+  },[audioRef])
 
   const nextSong = () => {
     if(!isPlaying) return
@@ -186,7 +204,7 @@ const Game: NextPage = () => {
         ):queue.length < 1 ? (
           <>
             <h2>Add songs</h2>
-            <input type="text" placeholder='youtube video url/playlist url/video title' value={URLInput} onChange={e=>setURLInput(e.target.value)}/>
+            <input type="text" placeholder='youtube video url/playlist url/video title' autoComplete='off' value={URLInput} onChange={e=>setURLInput(e.target.value)}/>
             <input type="button" value="Add" onClick={()=>addToSongs(URLInput)} />
             <input type="button" value="Start" onClick={()=>setQueue(shuffle(songsToSet))} />
             {
@@ -200,18 +218,22 @@ const Game: NextPage = () => {
             <h3>Added songs:</h3>
             <ol className={styles.to_set}>
               {songsToSet.length ? 
-              songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} className={styles.button+" "+styles.danger}>remove</span></li>)
+              songsToSet.map(song=><li key={song.id}>{song.title} <span onClick={()=>removeFromToSet(song.id)} className={styles.button+" "+styles.danger}><IoTrashBinSharp size={16} /></span></li>)
               : <em>none</em>
               }
               </ol>
           </>
         ) : (
           <>
-            {currentSong && <audio src={`/api/vid/${currentSong.id}`} onEnded={nextSong} onError={()=>currentIndex>=queue.length?setCurrentIndex(0):setCurrentIndex(currentIndex+1)} onCanPlay={e=>{e.currentTarget.play();setCurrentSongStartTimestamp(new Date().valueOf()); setIsPlaying(true)}}></audio>}
+            {currentSong && <audio src={`/api/vid/${currentSong.id}`} ref={audioRef} onEnded={nextSong} onError={()=>currentIndex>=queue.length?setCurrentIndex(0):setCurrentIndex(currentIndex+1)} onCanPlay={e=>{e.currentTarget.play();setCurrentSongStartTimestamp(new Date().valueOf()); setIsPlaying(true)}}></audio>}
             <h2>Song {currentIndex+1}/{queue.length}</h2>
             <div className={styles.name_input}>
-              <input type="text" list='songs' value={guess} onChange={e=>setGuess(e.currentTarget.value)} />
+              <input autoComplete='off' placeholder='song name' type="text" list='songs' value={guess} onChange={e=>setGuess(e.currentTarget.value)} />
               <ul className={styles.suggestions}>{queue.filter(search).sort(lSort).map(song => <li onClick={e=>{setGuess(e.currentTarget.innerText)}} key={song.id}>{song.title}</li>)}</ul>
+            </div>
+            <div className={styles.audio_data}>
+              <progress value={isPlaying ? currentSongTime : 0} max={isPlaying ? audioRef.current?.duration : 0} />
+              <input type="range" value={volume} max={1} min={0} step={0.01} onChange={e=>setVolume(e.currentTarget.valueAsNumber)} />
             </div>
             
             <input onClick={()=>nextSong()} type="button" value={isPlaying?'Check':'Loading...'} disabled={!isPlaying}/>

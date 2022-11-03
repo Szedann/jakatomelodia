@@ -108,16 +108,16 @@
 .header{
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin: 0;
   width: 100vw;
   position: fixed;
   padding: .5em 1em;
 }
 
-.header > *:after{
-  content: '|';
-  margin: 0 .2em;
+.header > div{
+  display: flex;
+  gap: .2em;
 }
 
 .header > *:last-of-type:after{
@@ -139,6 +139,8 @@
   justify-content: space-between;
   text-align: left;
   width: 100%;
+  background-color: rgb(0, 0, 0);
+  border-radius: .2em;
 }
 
 
@@ -148,6 +150,8 @@
   grid-template-columns: 2fr repeat(5, min-content);
   column-gap: .5rem;
   align-items: center;
+  overflow: hidden;
+  border-radius: .2em;
 }
 
 
@@ -185,6 +189,10 @@
   /* border-radius: 4px; */
   /* font-size: .8em; */
   width: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: .2em;
 }
 
 .playlist_field input[type="text"]{
@@ -192,7 +200,6 @@
   max-width: 25vw;
   border: 0;
   font-size: 1.2em;
-  border-bottom: 2px solid var(--color-primary);
   background-color: var(--color-secondary);
   color: var(--color-primary);
   border-radius: 0;
@@ -206,10 +213,24 @@
   height: 20em;
   display: flex;
   flex-direction: column;
+  gap: 5px;
 }
 
 .to_set{
   font-size: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.to_set > li{
+  display: flex;
+  justify-content: space-between;
+  background-color: #000;
+  outline: 1px solid #fff1;
+  border-radius: .3em;
+  padding: .2em;
+
 }
 
 .is_public{
@@ -221,4 +242,14 @@
 
 .is_public > span{
   text-align: right !important;
+}
+
+.audio_data{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.audio_data > input{
+  width: 20%;
 }

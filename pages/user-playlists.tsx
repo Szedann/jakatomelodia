@@ -15,6 +15,7 @@ import styles from '/styles/Home.module.css'
 import { FacebookShareButton, TwitterShareButton } from 'react-share'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
+import {IoTrashBinSharp} from 'react-icons/io5'
 
 
 interface song{
@@ -43,7 +44,7 @@ const Playlist = ({playlist, changePlaylistName, deletePlaylist, setPublic}:{pla
                       />
                 </label>
                 <Link href={`${location.origin}?playlistID=${playlist.id}`}><span className={styles.button}>play</span></Link>
-                <span className={styles.button+" "+styles.danger} onClick={()=>deletePlaylist(playlist.id)}>delete</span>
+                <span className={styles.button+" "+styles.danger} style={{width: 32}} onClick={()=>deletePlaylist(playlist.id)}><IoTrashBinSharp color='black' size={24} /></span>
                 <div onClick={()=>setExtended(!extended)} style={{cursor:"pointer", width:'fit-content'}}>{extended?"▲":"▼"}</div>
             </div>
 

@@ -10,17 +10,19 @@ const Navbar = ({user}:{user:User|null|undefined})=>{
         signInWithPopup(auth, provider)
       }
     return (<header className={styles.header}>
+        <div>
+          <Link href='/explore'><span className={styles.button}>explore</span></Link>
+          <Link href='/'><span className={styles.button}>play</span></Link>
+        </div>
         {user?(
-          <>
-              <span className={styles.user_display_name}>{user.displayName} </span>
-              <span className={styles.button} onClick={()=>signOut(auth)}>log out</span>
-              <Link href='/user-playlists'><span className={styles.button}>my playlists</span></Link>
-            </>
+          <div>
+            <span className={styles.user_display_name}>{user.displayName} </span>
+            <Link href='/user-playlists'><span className={styles.button}>my playlists</span></Link>
+            <span className={styles.button} onClick={()=>signOut(auth)}>log out</span>
+          </div>
         ):(
           <span>not signed in <span className={styles.button} onClick={signInWithGoogle}>Sign in with Google</span></span>
           )}
-          <Link href='/explore'><span className={styles.button}>explore</span></Link>
-          <Link href='/'><span className={styles.button}>play</span></Link>
       </header>)
 }
 

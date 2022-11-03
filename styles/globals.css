@@ -16,12 +16,12 @@ body {
 
 :root{
   --color-primary: #fff;
-  --color-secondary: #000;
+  --color-secondary: rgb(6, 12, 41);
 }
 
 @media (prefers-color-scheme: dark) {
   :root{
-  --color-primary: #000;
+  --color-primary: rgb(3, 5, 19);
   --color-secondary: #fff;
   }
 }
