@@ -15,7 +15,7 @@ import styles from '/styles/Home.module.css'
 import { FacebookShareButton, TwitterShareButton } from 'react-share'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
-import {IoTrashBinSharp} from 'react-icons/io5'
+import { IoTrashBinSharp, IoLogoFacebook, IoLogoTwitter, IoClipboard} from 'react-icons/io5'
 
 
 
@@ -161,31 +161,32 @@ const Game: NextPage = () => {
             <h1>Game Ended!</h1>
               {user ? (
                 <div className={styles.share_menu}>
-                  <h3>Share your playlist</h3>
+
+                  <h3>Share your results</h3>
+                  {playlistID ? (
+                    <div style={{display: "flex", alignItems: "center", gap: 10, marginTop: 10, fontSize: "2em"}}>
+                      <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
+                        <IoLogoFacebook />
+                      </FacebookShareButton>
+                      <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
+                        <IoLogoTwitter />
+                      </TwitterShareButton>
+                      <span className={styles.button} onClick={()=>{const sr = shareResults();copy(sr.text+'\n'+sr.url)}}>
+                        <IoClipboard />
+                      </span>
+                    </div>
+                  ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
+
+                  <h3>Or just your playlist</h3>
                   {playlistID?(
-                  <div className={styles.share_playlist}>
-                    click on the link to copy: <br />
-                    <code className={styles.button} onClick={e=>copy(e.currentTarget.innerText)}>
-                      {location.origin}?playlistID={playlistID}
+                  <div style={{fontSize: "2em"}}>
+                    <code className={styles.button} onClick={e=>copy(`${location.origin}?playlistID=${playlistID}`)}>
+                      <IoClipboard />
                     </code>
                   </div>)
                   :
                   (<><span onClick={savePlaylist} className={styles.button}>save the playlist</span> for you & your friends to play</>)}
-                  <h3>Or share your results on</h3>
-                  {playlistID ? (
-                    <div>
-                      <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>
-                        Facebook,
-                      </FacebookShareButton>
-                      <TwitterShareButton className={styles.button} title={shareResults().text} url={shareResults().url} hashtags={["NameTT"]}>
-                        Twitter,
-                      </TwitterShareButton>
-                      or&nbsp;
-                      <span className={styles.button} onClick={()=>{const sr = shareResults();copy(sr.text+'\n'+sr.url)}}>
-                        copy the invite to paste it anywhere
-                      </span>
-                    </div>
-                  ) : <span className={styles.button} onClick={savePlaylist}>on...</span>}
+
                   <p></p>
                 </div>
                 

@@ -16,6 +16,8 @@ import { FacebookShareButton, TwitterShareButton } from 'react-share'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
 import {IoTrashBinSharp} from 'react-icons/io5'
+import { FaPlay } from 'react-icons/fa'
+
 
 
 interface song{
@@ -37,13 +39,8 @@ const Playlist = ({playlist, changePlaylistName, deletePlaylist, setPublic}:{pla
             <div className={styles.general}>
                 <input type="text" value={playlist.name||''} placeholder="unnamed" onChange={e=>changePlaylistName(playlist.id, e.currentTarget.value)} />
                 <span className={styles.song_amount}>{playlist.songs.length} songs</span>
-                <label className={styles.is_public}>
-                    <span>public</span>
-                    <input type="checkbox" checked={isPublic}
-                     onChange={e=>{setPublic(playlist.id, e.currentTarget.checked); setIsPublic(e.currentTarget.checked)}}
-                      />
-                </label>
-                <Link href={`${location.origin}?playlistID=${playlist.id}`}><span className={styles.button}>play</span></Link>
+                {/* <label   */}
+                <Link href={`${location.origin}?playlistID=${playlist.id}`}><span className={styles.button}><FaPlay size={20} /></span></Link>
                 <span className={styles.button+" "+styles.danger} style={{width: 32}} onClick={()=>deletePlaylist(playlist.id)}><IoTrashBinSharp color='black' size={24} /></span>
                 <div onClick={()=>setExtended(!extended)} style={{cursor:"pointer", width:'fit-content'}}>{extended?"▲":"▼"}</div>
             </div>

@@ -16,7 +16,7 @@
   text-align: center;
 }
 
-.main *{
+.main > *{
   width: 100%;
 }
 
@@ -67,6 +67,7 @@
 }
 .name_input > *{
   padding: .3em .5em;
+  width: 100%;
 }
 .name_input:focus-within .suggestions, .name_input:hover .suggestions, .suggestions:hover{
   display: flex;
@@ -91,8 +92,9 @@
 }
 
 .button{
-  text-decoration: underline;
   cursor: pointer;
+  align-items: center;
+  display: flex;
 }
 .button:hover{
   text-decoration:underline;
@@ -106,18 +108,39 @@
 }
 
 .header{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   margin: 0;
   width: 100vw;
   position: fixed;
-  padding: .5em 1em;
+  padding: 1em;
+  place-items: center;
+  /* background-color: var(--color-primary); */
+  background-image: linear-gradient(var(--color-primary) 80%,#0000);
 }
 
 .header > div{
   display: flex;
-  gap: .2em;
+  gap: .5em;
+  align-items: center;
+}
+
+.header > div > span{
+  width: 32px;
+  height: 32px;
+}
+
+.logo{
+  filter: invert(1);
+  padding: 10px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.profile_picture{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 
 .header > *:last-of-type:after{
@@ -169,7 +192,7 @@
 }
 
 .song_amount{
-  width: 10em !important;
+  width: max-content;
 }
 
 .playlist_field .extended li{
@@ -184,7 +207,7 @@
 }
 
 .danger{
-  background-color: var(--color-secondary);
+  background-color: rgb(255, 85, 85);
   color: var(--color-primary);
   padding: 0px 4px;
   /* border-radius: 4px; */
@@ -194,6 +217,7 @@
   justify-content: center;
   align-items: center;
   border-radius: .2em;
+  align-self: stretch;
 }
 
 .playlist_field input[type="text"]{
@@ -232,7 +256,7 @@
   outline: 1px solid #fff1;
   border-radius: .3em;
   padding: .2em;
-
+  padding-left: .5em;
 }
 
 .is_public{
@@ -252,6 +276,10 @@
   align-items: center;
   gap: 5px;
   margin: 2px 0;
+}
+
+.audio_data > progress{
+  width: 100%;
 }
 
 .audio_data > input{
