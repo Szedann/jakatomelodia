@@ -152,6 +152,7 @@
   align-items: center;
   overflow: hidden;
   border-radius: .2em;
+  padding-right: .5em;
 }
 
 
@@ -178,8 +179,8 @@
 }
 
 .playlist_field .extended li:nth-child(2n){
-  background-color: var(--color-secondary);
-  color: var(--color-primary);
+  background-color: #fff2;
+  /* color: var(--color-primary); */
 }
 
 .danger{
@@ -206,6 +207,7 @@
   padding: 0;
   margin: 0;
   text-align: left;
+  padding-left: .5em;
 }
 
 
@@ -256,4 +258,12 @@
   width: 20%;
   margin: 0;
   outline: 0;
+}
+
+.correct_guess{
+  color: #4f4;
+}
+
+.incorrect_guess{
+  color: #f44;
 }

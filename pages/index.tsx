@@ -160,8 +160,8 @@ const Game: NextPage = () => {
           <>
             <h1>Game Ended!</h1>
               {user ? (
-                
                 <div className={styles.share_menu}>
+                  <h3>Share your playlist</h3>
                   {playlistID?(
                   <div className={styles.share_playlist}>
                     click on the link to copy: <br />
@@ -171,7 +171,7 @@ const Game: NextPage = () => {
                   </div>)
                   :
                   (<><span onClick={savePlaylist} className={styles.button}>save the playlist</span> for you & your friends to play</>)}
-                  <span>or share your results on</span>
+                  <h3>Or share your results on</h3>
                   {playlistID ? (
                     <div>
                       <FacebookShareButton className={styles.button} quote={shareResults().text} url={shareResults().url} hashtag={"NameTT"}>

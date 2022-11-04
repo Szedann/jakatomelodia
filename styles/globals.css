@@ -14,17 +14,12 @@ body {
   box-sizing: border-box;
 }
 
-:root{
-  --color-primary: #fff;
-  --color-secondary: rgb(6, 12, 41);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root{
+:root{
   --color-primary: rgb(3, 5, 19);
   --color-secondary: #fff;
-  }
 }
+
 
 ul {
   list-style: none;
